@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wavify — Music Player</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Google Fonts: Space Grotesk + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════
+       TOAST NOTIFICATION CONTAINER
+  ════════════════════════════════════════════ -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- ═══════════════════════════════════════════
+       SIDEBAR
+  ════════════════════════════════════════════ -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <span class="logo-icon">
+        <!-- Waveform SVG icon -->
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="1"  y="10" width="3" height="8"  rx="1.5" fill="currentColor"/>
+          <rect x="6"  y="5"  width="3" height="18" rx="1.5" fill="currentColor"/>
+          <rect x="11" y="2"  width="3" height="24" rx="1.5" fill="currentColor"/>
+          <rect x="16" y="7"  width="3" height="14" rx="1.5" fill="currentColor"/>
+          <rect x="21" y="12" width="3" height="6"  rx="1.5" fill="currentColor"/>
+          <rect x="24" y="9"  width="3" height="10" rx="1.5" fill="currentColor"/>
+        </svg>
+      </span>
+      <span class="logo-text">Rishify</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Main navigation">
+      <ul>
+        <li><a href="#" class="nav-link active" data-section="library">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          Library
+        </a></li>
+        <li><a href="#" class="nav-link" data-section="favorites">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          Favourites
+        </a></li>
+        <li><a href="#" class="nav-link" data-section="recent">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Recently Played
+        </a></li>
+      </ul>
+    </nav>
+
+    <div class="sidebar-stats">
+      <span id="total-songs-label">0 songs</span>
+    </div>
+
+    <button class="sidebar-close" id="sidebar-close" aria-label="Close sidebar">✕</button>
+  </aside>
+
+  <!-- Overlay for mobile sidebar -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- ═══════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════════ -->
+  <main class="main-content" id="main-content">
+
+    <!-- ── HEADER ── -->
+    <header class="top-header">
+      <button class="hamburger" id="hamburger" aria-label="Open sidebar">
+        <span></span><span></span><span></span>
+      </button>
+
+      <h1 class="header-title" id="section-title">Library</h1>
+
+      <div class="header-right">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="search-input" placeholder="Search songs or artists…" aria-label="Search songs" />
+        </div>
+
+        <!-- Theme toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span class="theme-icon" id="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── SECTIONS ── -->
+
+    <!-- LIBRARY SECTION -->
+    <section class="section active" id="section-library" aria-label="Music library">
+      <div class="section-header">
+        <h2>All Songs</h2>
+        <span id="filtered-count" class="pill"></span>
+      </div>
+      <ul class="song-list" id="song-list" role="list"></ul>
+    </section>
+
+    <!-- FAVOURITES SECTION -->
+    <section class="section" id="section-favorites" aria-label="Favourite songs">
+      <div class="section-header"><h2>Favourites</h2></div>
+      <ul class="song-list" id="fav-list" role="list">
+        <li class="empty-state" id="fav-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          <p>No favourites yet. Tap the heart on any song!</p>
+        </li>
+      </ul>
+    </section>
+
+    <!-- RECENT SECTION -->
+    <section class="section" id="section-recent" aria-label="Recently played songs">
+      <div class="section-header"><h2>Recently Played</h2></div>
+      <ul class="song-list" id="recent-list" role="list">
+        <li class="empty-state" id="recent-empty">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="48" height="48"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <p>Nothing played yet. Start listening!</p>
+        </li>
+      </ul>
+    </section>
+
+  </main><!-- /main-content -->
+
+  <!-- ═══════════════════════════════════════════
+       BOTTOM PLAYER BAR
+  ════════════════════════════════════════════ -->
+  <footer class="player-bar" id="player-bar" aria-label="Music player">
+
+    <!-- Song info -->
+    <div class="player-info">
+      <div class="player-cover-wrap">
+        <img id="player-cover" src="" alt="Album cover" loading="lazy" />
+        <!-- Equalizer bars (animated when playing) -->
+        <div class="eq-bars" id="eq-bars" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <!-- Loading spinner overlay -->
+        <div class="track-loading" id="track-loading" aria-hidden="true">
+          <div class="spinner"></div>
+        </div>
+      </div>
+      <div class="player-meta">
+        <p class="player-title" id="player-title">No song selected</p>
+        <p class="player-artist" id="player-artist">—</p>
+      </div>
+      <button class="fav-btn player-fav" id="player-fav-btn" aria-label="Add to favourites" title="Favourite">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+      </button>
+    </div>
+
+    <!-- Controls + progress -->
+    <div class="player-center">
+      <div class="player-controls">
+        <button class="ctrl-btn" id="shuffle-btn" aria-label="Shuffle" title="Shuffle (off)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+        </button>
+        <button class="ctrl-btn" id="prev-btn" aria-label="Previous track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" y1="19" x2="5" y2="5" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <button class="ctrl-btn play-pause-btn" id="play-btn" aria-label="Play">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="ctrl-btn" id="next-btn" aria-label="Next track">
+          <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <button class="ctrl-btn" id="repeat-btn" aria-label="Repeat" title="Repeat off">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+        </button>
+      </div>
+
+      <div class="progress-wrap" role="group" aria-label="Playback progress">
+        <span class="time-label" id="current-time">0:00</span>
+        <div class="progress-bar-track" id="progress-track" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          <div class="progress-bar-fill" id="progress-fill"></div>
+          <div class="progress-thumb" id="progress-thumb"></div>
+        </div>
+        <span class="time-label" id="total-time">0:00</span>
+      </div>
+    </div>
+
+    <!-- Volume + mini-player toggle -->
+    <div class="player-right">
+      <button class="ctrl-btn vol-btn" id="mute-btn" aria-label="Mute">
+        <svg id="vol-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path id="vol-wave1" d="M15.54 8.46a5 5 0 010 7.07"/><path id="vol-wave2" d="M19.07 4.93a10 10 0 010 14.14"/></svg>
+      </button>
+      <div class="vol-track-wrap">
+        <input type="range" id="volume-slider" class="volume-slider" min="0" max="100" value="80" aria-label="Volume" />
+      </div>
+      <button class="mini-player-btn" id="mini-toggle" aria-label="Toggle mini player" title="Mini player">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="15" width="20" height="7" rx="2"/><polyline points="2 10 12 4 22 10"/></svg>
+      </button>
+    </div>
+
+  </footer><!-- /player-bar -->
+
+  <!-- Hidden HTML5 audio element -->
+  <audio id="audio-el" preload="auto"></audio>
+
+  <script src="script.js"></script>
+</body>
+</html>
